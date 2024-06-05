@@ -1,0 +1,30 @@
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+url = "https://ticker.finology.in/"
+r = requests.get(url)
+
+results = BeautifulSoup(r.text, "lxml")
+
+tables = results.find('table', class_='table table-sm table-hover screenertable')
+headers = tables.find_all('th')
+all_headers = [header.text.strip() for header in headers]
+
+df = pd.DataFrame(columns=all_headers)
+
+rows = results.find_all('tr')
+
+for row in rows[1:]:
+     data = row.find_all('td')
+     current = [tr.text.strip() for tr in data]
+
+     # Ensure row data matches the number of headers
+     if len(current) == len(all_headers):
+         df.loc[len(df)] = current
+
+print(df)
+
+df.to_csv("Table_Data.csv")
+
+
