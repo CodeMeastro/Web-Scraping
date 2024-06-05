@@ -1,0 +1,33 @@
+Project Statement:
+Extract a table from the TATA IPL Auction Stats (2024)
+
+Solution : 
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+url = "https://www.iplt20.com/auction"
+r = requests.get(url)
+
+results = BeautifulSoup(r.content, "lxml")
+table = results.find('table', class_='ih-td-tab auction-tbl')
+
+header = table.find_all('th')
+all_headers = [th.text.strip() for th in header]
+
+df = pd.DataFrame(columns=all_headers)
+
+rows = table.find_all('tr')
+
+for row in rows[1:]:
+    data = row.find_all('td')
+    if data:
+         current_row = [tr.text.strip() for tr in data]
+         if len(current_row) == len(all_headers):
+              df.loc[len(df)] = current_row
+         else:
+             print("not equal")
+
+print(df)
+df.to_csv("ipl_auction_stats.csv")
+
