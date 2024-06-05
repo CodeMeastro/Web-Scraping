@@ -1,0 +1,49 @@
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+url = "https://webscraper.io/test-sites/e-commerce/allinone/computers/tablets"
+r = requests.get(url)
+
+results = BeautifulSoup(r.text, "lxml")
+
+titles = results.find_all(class_="title")
+all_titles = []
+
+for i in titles:
+    titles = i.text
+    all_titles.append(titles)
+
+#print(all_titles)
+
+prices = results.find_all(class_="price float-end card-title pull-right")
+all_prices = []
+
+for i in prices:
+    prices = i.text
+    all_prices.append(prices)
+
+#print(all_prices)
+
+descriptions = results.find_all(class_="description card-text")
+all_descriptions = []
+
+for i in descriptions:
+    descriptions = i.text
+    all_descriptions.append(descriptions)
+
+#print(all_descriptions)
+
+reviews = results.find_all(class_="review-count float-end")
+all_reviews = []
+
+for i in reviews:
+    reviews = i.text
+    all_reviews.append(reviews)
+
+#print(all_reviews)
+
+dataFrame = pd.DataFrame({"Product Names": all_titles, "Prices List": all_prices, "Descriptions": all_descriptions, "Reviews": all_reviews})
+#print(dataFrame)
+
+dataFrame.to_csv("product_details.csv")
